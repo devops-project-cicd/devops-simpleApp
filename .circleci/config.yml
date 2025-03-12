@@ -1,8 +1,7 @@
-# This config was automatically generated from your source code
-# Stacks detected: deps:node:.
 version: 2.1
 orbs:
   node: circleci/node@5
+
 jobs:
   test-node:
     # Install node dependencies and run tests
@@ -14,19 +13,29 @@ jobs:
       - run:
           name: Run tests
           command: npm test --passWithNoTests
+
   deploy:
-    # This is an example deploy job, not actually used by the workflow
+    # Deploy job to automatically update EC2
     docker:
       - image: cimg/base:stable
     steps:
-      # Replace this with steps to deploy to users
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:7K1nZcnB5r2EY0MKi1nx1s2HmG9n7qYjkk+QXrDvTxY"
       - run:
-          name: deploy
-          command: '#e.g. ./deploy.sh'
+          name: Deploy to EC2
+          command: |
+            ssh -o StrictHostKeyChecking=no ubuntu@ec2-34-201-41-253.compute-1.amazonaws.com << 'EOF'
+            cd ~/devops-simpleApp
+            git pull origin main
+            pm2 restart all  # Restart Node.js app
+            exit
+            EOF
+
 workflows:
-  build-and-test:
+  build-and-deploy:
     jobs:
       - test-node
-    # - deploy:
-    #     requires:
-    #       - test-node
+      - deploy:
+          requires:
+            - test-node
