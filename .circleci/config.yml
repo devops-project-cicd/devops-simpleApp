@@ -25,7 +25,7 @@ jobs:
       - run:
           name: Deploy to EC2
           command: |
-            ssh -o StrictHostKeyChecking=no ubuntu@ec2-34-201-41-253.compute-1.amazonaws.com bash -c '
+            ssh -o StrictHostKeyChecking=no ubuntu@3.209.163.115 bash -c '
               cd ~/devops-simpleApp
               git pull origin main
               pm2 restart all  # Restart Node.js app
