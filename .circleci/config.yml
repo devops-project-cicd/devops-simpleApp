@@ -28,9 +28,9 @@ jobs:
               git reset --hard HEAD  # Discard local changes
               git pull origin main
               npm install -g pm2  # Ensure PM2 is installed
-              npm install  # Ensure dependencies are installed
-              pm2 delete all || true  # Delete any old processes
-              pm2 start index.js --name "devops-app"  # Start the app
+              npm install  # Install dependencies
+              pm2 delete all || true  # Remove any old processes
+              pm2 start npm --name "devops-app" -- start  # Start app using npm
               pm2 save  # Save process for auto-restart
             '
 
