@@ -23,16 +23,12 @@ jobs:
       - run:
           name: Deploy to EC2
           command: |
-            ssh -o StrictHostKeyChecking=no ubuntu@<YOUR_EC2_IP> bash -c '
+            ssh -o StrictHostKeyChecking=no ubuntu@3.209.163.115 bash -c '
               cd ~/devops-simpleApp
               git reset --hard HEAD  # Discard local changes
-              git pull origin main  # Pull latest changes
+              git pull origin main
               npm install  # Install dependencies
-
-              # Start the application properly (choose ONE method)
-              nohup npm start > app.log 2>&1 &  # Without PM2
-              # pm2 start npm --name "devops-app" -- start  # If using PM2
-              # pm2 save  # Save PM2 state (only if using PM2)
+              nohup npm start > app.log 2>&1 &  # Start the app in background
             '
 
 workflows:
