@@ -1,11 +1,9 @@
-# This config was automatically generated from your source code
-# Stacks detected: deps:node:.
 version: 2.1
 orbs:
   node: circleci/node@5
+
 jobs:
   test-node:
-    # Install node dependencies and run tests
     executor: node/default
     steps:
       - checkout
@@ -14,19 +12,35 @@ jobs:
       - run:
           name: Run tests
           command: npm test --passWithNoTests
+
   deploy:
-    # This is an example deploy job, not actually used by the workflow
     docker:
       - image: cimg/base:stable
     steps:
-      # Replace this with steps to deploy to users
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:7K1nZcnB5r2EY0MKi1nx1s2HmG9n7qYjkk+QXrDvTxY"
       - run:
-          name: deploy
-          command: '#e.g. ./deploy.sh'
+          name: Deploy to EC2
+          command: |
+            ssh -o StrictHostKeyChecking=no ubuntu@3.209.163.115 bash -c '
+              cd ~/devops-simpleApp
+              git reset --hard HEAD  # Discard local changes
+              git pull origin main
+              npm install  # Install dependencies
+              
+              # Set environment variables for SSL/TLS
+              echo "$PRIVATE_KEY" > privatekey.pem
+              echo "$SERVER" > server.crt
+              
+              # Start application with HTTPS
+              nohup npm start > app.log 2>&1 &
+            '
+
 workflows:
-  build-and-test:
+  build-and-deploy:
     jobs:
       - test-node
-    # - deploy:
-    #     requires:
-    #       - test-node
+      - deploy:
+          requires:
+            - test-node
