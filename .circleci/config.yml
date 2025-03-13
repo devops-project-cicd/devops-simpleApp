@@ -28,7 +28,13 @@ jobs:
               git reset --hard HEAD  # Discard local changes
               git pull origin main
               npm install  # Install dependencies
-              nohup npm start > app.log 2>&1 &  # Start the app in background
+              
+              # Set environment variables for SSL/TLS
+              echo "$PRIVATE_KEY" > privatekey.pem
+              echo "$SERVER" > server.crt
+              
+              # Start application with HTTPS
+              nohup npm start > app.log 2>&1 &
             '
 
 workflows:
